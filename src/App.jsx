@@ -4,6 +4,9 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sisterName, setSisterName] = useState("");
 
+  // Configurable Contact/Payment link for "Bhai ka number" and "Message your bro"
+  const BROTHER_CONTACT_LINK = "https://wa.me/?text=Bhai%20ko%20100%20rupees%20bhej%20diye!%20%E2%9D%A4%EF%B8%8F";
+
   // --- PAGE 1 TYPEWRITER STATE ---
   const page1FullText = "Hello Meri Pyari Sister Ji";
   const [page1TypedText, setPage1TypedText] = useState("");
@@ -125,32 +128,39 @@ export default function App() {
   const [page7TypedPehle, setPage7TypedPehle] = useState(["", ""]);
   const [isPage7PehleDone, setIsPage7PehleDone] = useState(false);
 
-  // --- PAGE 8 TYPEWRITER STATE ('initial' | 'yes_okay' | 'no_scan') ---
+  // --- PAGE 8 (FINAL PAGE) TYPEWRITER STATE ('initial' | 'yes_sent' | 'no_sent') ---
   const [page8Stage, setPage8Stage] = useState('initial');
 
   const page8InitialLines = [
-    "Dekho… main aapko ek QR code bhej raha hoon 👀📱",
-    "Aap apne mobile se isse scan kariye,",
-    "phir wapas isi website par aa jana… okay? ❤️"
+    "Dekho… kya dekh rahi ho? 👀",
+    "Mujhe, apne bhai ko, bas ₹100 chahiye 😂❤️",
+    "Bhai ke number pe bhej do na…"
   ];
   const [page8TypedInitial, setPage8TypedInitial] = useState(["", "", ""]);
   const [isPage8InitialDone, setIsPage8InitialDone] = useState(false);
 
   const page8YesLines = [
-    "Good girl 😌❤️",
-    "Ab QR scan karo…",
-    "Main yahin wait kar raha hoon 👀"
+    "Bhej diya na? 😌❤️",
+    "Thank you meri pyari sister ji!",
+    "Aap sach mein best ho 😂❤️"
   ];
   const [page8TypedYes, setPage8TypedYes] = useState(["", "", ""]);
   const [isPage8YesDone, setIsPage8YesDone] = useState(false);
 
   const page8NoLines = [
-    "Arey… 🥺",
-    "Itna sa kaam bhi nahi karogi?",
-    "Chalo please, ek baar scan kar lo ❤️"
+    "Kyun nahi bheja? 😭",
+    "Apne bhai ko ₹100 bhi nahi dogi? 😂"
   ];
-  const [page8TypedNo, setPage8TypedNo] = useState(["", "", ""]);
+  const [page8TypedNo, setPage8TypedNo] = useState(["", ""]);
   const [isPage8NoDone, setIsPage8NoDone] = useState(false);
+
+  // --- PAGE 9 (THANK YOU FINAL SCREEN) TYPEWRITER STATE ---
+  const page9Lines = [
+    `Thank you meri pyari sister ji ❤️`,
+    "— Your Bro, Jay 😎"
+  ];
+  const [page9TypedLines, setPage9TypedLines] = useState(["", ""]);
+  const [isPage9Done, setIsPage9Done] = useState(false);
 
   // --- PAGE 1 EFFECT ---
   useEffect(() => {
@@ -640,9 +650,9 @@ export default function App() {
     }
   }, [currentPage, page8Stage]);
 
-  // --- PAGE 8 YES OKAY EFFECT ---
+  // --- PAGE 8 YES EFFECT ---
   useEffect(() => {
-    if (currentPage === 8 && page8Stage === 'yes_okay') {
+    if (currentPage === 8 && page8Stage === 'yes_sent') {
       setPage8TypedYes(["", "", ""]);
       setIsPage8YesDone(false);
 
@@ -674,10 +684,10 @@ export default function App() {
     }
   }, [currentPage, page8Stage]);
 
-  // --- PAGE 8 NO SCAN EFFECT ---
+  // --- PAGE 8 NO EFFECT ---
   useEffect(() => {
-    if (currentPage === 8 && page8Stage === 'no_scan') {
-      setPage8TypedNo(["", "", ""]);
+    if (currentPage === 8 && page8Stage === 'no_sent') {
+      setPage8TypedNo(["", ""]);
       setIsPage8NoDone(false);
 
       let currentLineIdx = 0;
@@ -707,6 +717,40 @@ export default function App() {
       return () => clearInterval(timer);
     }
   }, [currentPage, page8Stage]);
+
+  // --- PAGE 9 (FINAL SCREEN) EFFECT ---
+  useEffect(() => {
+    if (currentPage === 9) {
+      setPage9TypedLines(["", ""]);
+      setIsPage9Done(false);
+
+      let currentLineIdx = 0;
+      let charIdx = 0;
+
+      const timer = setInterval(() => {
+        if (currentLineIdx < page9Lines.length) {
+          const targetLine = page9Lines[currentLineIdx];
+          if (charIdx < targetLine.length) {
+            const nextChar = targetLine.slice(0, charIdx + 1);
+            setPage9TypedLines((prev) => {
+              const updated = [...prev];
+              updated[currentLineIdx] = nextChar;
+              return updated;
+            });
+            charIdx++;
+          } else {
+            currentLineIdx++;
+            charIdx = 0;
+          }
+        } else {
+          clearInterval(timer);
+          setIsPage9Done(true);
+        }
+      }, 60);
+
+      return () => clearInterval(timer);
+    }
+  }, [currentPage]);
 
   // Navigation Handlers
   const handlePage1Continue = () => setCurrentPage(2);
@@ -744,8 +788,17 @@ export default function App() {
     setCurrentPage(8);
   };
 
-  const handlePage8Continue = () => {
+  const handlePage8Complete = () => {
     setCurrentPage(9);
+  };
+
+  const handlePage8Return = () => {
+    setPage7Stage('initial');
+    setCurrentPage(7);
+  };
+
+  const handleOpenContactLink = () => {
+    window.open(BROTHER_CONTACT_LINK, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -1343,7 +1396,7 @@ export default function App() {
         </div>
       )}
 
-      {/* PAGE 8: QR Code Surprise 📱 */}
+      {/* PAGE 8: Brother’s Little Request 😂❤️ */}
       {currentPage === 8 && (
         <div className="max-w-5xl w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 animate-fade-in">
           
@@ -1359,15 +1412,15 @@ export default function App() {
             </div>
           </div>
 
-          {/* Right Side (65%): Text & Scannable QR Code */}
+          {/* Right Side (65%): Dialogue & Request Logic */}
           <div className="w-full md:w-[65%] text-left space-y-4 md:space-y-6">
             
             {page8Stage === 'initial' && (
               <div className="space-y-4">
                 <div className="font-robot text-lg sm:text-2xl md:text-3xl font-normal tracking-wide text-white leading-relaxed robot-glow space-y-2">
                   <p>{page8TypedInitial[0]}</p>
-                  <p className="text-slate-200">{page8TypedInitial[1]}</p>
-                  <p className="text-rose-300 font-medium">
+                  <p className="text-amber-300 font-medium">{page8TypedInitial[1]}</p>
+                  <p className="text-slate-200">
                     {page8TypedInitial[2]}
                     {!isPage8InitialDone && (
                       <span className="inline-block w-2 sm:w-3 h-5 sm:h-7 bg-white/90 animate-cursor ml-1" />
@@ -1375,51 +1428,70 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* Prominently Displayed QR Code Card */}
                 {isPage8InitialDone && (
-                  <div className="space-y-4 animate-fade-in">
+                  <div className="space-y-6 animate-fade-in pt-2">
                     
-                    <div className="inline-block p-3 bg-white rounded-2xl shadow-2xl border-4 border-rose-400/80">
-                      <img
-                        src="/qr-code.png"
-                        alt="Surprise QR Code"
-                        className="w-44 h-44 sm:w-52 sm:h-52 object-contain"
-                      />
+                    {/* Clickable text link: "Bhai ka number →" */}
+                    <div 
+                      onClick={handleOpenContactLink}
+                      className="group inline-flex items-center gap-1.5 font-robot text-base sm:text-xl text-rose-400 hover:text-rose-300 cursor-pointer transition-colors"
+                    >
+                      <span className="underline underline-offset-4 decoration-rose-500/60 group-hover:decoration-rose-300 font-semibold">
+                        Bhai ka number
+                      </span>
+                      <span className="group-hover:translate-x-1 transition-transform duration-200">
+                        →
+                      </span>
                     </div>
 
-                    <p className="font-robot text-xs sm:text-sm text-slate-300 font-medium tracking-wide">
-                      Scan karo 📱 → Wapas website par aao ❤️
-                    </p>
+                    {/* Question: ₹100 bhej diya? 👀 */}
+                    <div className="space-y-3 pt-2">
+                      <p className="font-robot text-base sm:text-xl text-slate-300 font-medium">
+                        ₹100 bhej diya? 👀
+                      </p>
 
-                    {/* Text-Only Confirmation Options */}
-                    <div className="pt-2 flex flex-wrap items-center gap-6 font-robot text-base sm:text-lg text-slate-400">
-                      
-                      {/* Option 1: Yes, okay ❤️ */}
+                      <div className="flex flex-wrap items-center gap-6 font-robot text-base sm:text-lg text-slate-400">
+                        {/* Choice 1: Yes, bhej diya ❤️ */}
+                        <div 
+                          onClick={() => setPage8Stage('yes_sent')}
+                          className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white transition-colors py-1"
+                        >
+                          <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
+                            Yes, bhej diya ❤️
+                          </span>
+                          <span className="group-hover:translate-x-1 transition-transform duration-200">
+                            →
+                          </span>
+                        </div>
+
+                        {/* Choice 2: No 😭 */}
+                        <div 
+                          onClick={() => setPage8Stage('no_sent')}
+                          className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-rose-400 transition-colors py-1"
+                        >
+                          <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-rose-400">
+                            No 😭
+                          </span>
+                          <span className="group-hover:translate-x-1 transition-transform duration-200">
+                            →
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Return Option */}
+                    <div className="pt-4">
                       <div 
-                        onClick={() => setPage8Stage('yes_okay')}
-                        className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white transition-colors py-1"
+                        onClick={handlePage8Return}
+                        className="group inline-flex items-center gap-1 font-robot text-xs sm:text-sm text-slate-500 hover:text-slate-300 cursor-pointer transition-colors"
                       >
-                        <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
-                          Yes, okay ❤️
+                        <span className="group-hover:-translate-x-1 transition-transform duration-200">
+                          ←
                         </span>
-                        <span className="group-hover:translate-x-1 transition-transform duration-200">
-                          →
+                        <span className="underline underline-offset-4 decoration-slate-700 group-hover:decoration-slate-400">
+                          Return
                         </span>
                       </div>
-
-                      {/* Option 2: No 🙈 */}
-                      <div 
-                        onClick={() => setPage8Stage('no_scan')}
-                        className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-rose-400 transition-colors py-1"
-                      >
-                        <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-rose-400">
-                          No 🙈
-                        </span>
-                        <span className="group-hover:translate-x-1 transition-transform duration-200">
-                          →
-                        </span>
-                      </div>
-
                     </div>
 
                   </div>
@@ -1427,12 +1499,12 @@ export default function App() {
               </div>
             )}
 
-            {page8Stage === 'yes_okay' && (
+            {page8Stage === 'yes_sent' && (
               <div className="space-y-4">
                 <div className="font-robot text-xl sm:text-2xl md:text-3xl font-normal tracking-wide text-white leading-relaxed robot-glow space-y-2">
                   <p className="text-rose-300 font-medium">{page8TypedYes[0]}</p>
                   <p>{page8TypedYes[1]}</p>
-                  <p className="text-slate-200">
+                  <p className="text-amber-300 font-medium">
                     {page8TypedYes[2]}
                     {!isPage8YesDone && (
                       <span className="inline-block w-2 sm:w-3 h-5 sm:h-7 bg-white/90 animate-cursor ml-1" />
@@ -1440,23 +1512,14 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* QR Code Remains Clearly Visible */}
-                <div className="inline-block p-3 bg-white rounded-2xl shadow-2xl border-4 border-rose-400/80 my-2">
-                  <img
-                    src="/qr-code.png"
-                    alt="Surprise QR Code"
-                    className="w-44 h-44 sm:w-52 sm:h-52 object-contain"
-                  />
-                </div>
-
                 {isPage8YesDone && (
-                  <div className="pt-2 font-robot text-base text-slate-400 animate-fade-in">
+                  <div className="pt-6 font-robot text-base text-slate-400 animate-fade-in">
                     <div 
-                      onClick={handlePage8Continue}
+                      onClick={handlePage8Complete}
                       className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white transition-colors py-1"
                     >
-                      <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
-                        Scanned! Continue
+                      <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white font-semibold">
+                        Complete ❤️
                       </span>
                       <span className="group-hover:translate-x-1 transition-transform duration-200">
                         →
@@ -1467,40 +1530,50 @@ export default function App() {
               </div>
             )}
 
-            {page8Stage === 'no_scan' && (
+            {page8Stage === 'no_sent' && (
               <div className="space-y-4">
                 <div className="font-robot text-lg sm:text-2xl md:text-3xl font-normal tracking-wide text-white leading-relaxed robot-glow space-y-2">
                   <p className="text-rose-400">{page8TypedNo[0]}</p>
-                  <p>{page8TypedNo[1]}</p>
-                  <p className="text-rose-300 font-medium">
-                    {page8TypedNo[2]}
+                  <p className="text-amber-300 font-medium">
+                    {page8TypedNo[1]}
                     {!isPage8NoDone && (
                       <span className="inline-block w-2 sm:w-3 h-5 sm:h-7 bg-white/90 animate-cursor ml-1" />
                     )}
                   </p>
                 </div>
 
-                {/* QR Code Remains Clearly Visible */}
-                <div className="inline-block p-3 bg-white rounded-2xl shadow-2xl border-4 border-rose-400/80 my-2">
-                  <img
-                    src="/qr-code.png"
-                    alt="Surprise QR Code"
-                    className="w-44 h-44 sm:w-52 sm:h-52 object-contain"
-                  />
-                </div>
-
                 {isPage8NoDone && (
-                  <div className="pt-2 font-robot text-base text-slate-400 animate-fade-in">
+                  <div className="space-y-6 animate-fade-in pt-2">
+                    {/* Clickable text link: "Apne bro ko message karo →" */}
                     <div 
-                      onClick={handlePage8Continue}
-                      className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white transition-colors py-1"
+                      onClick={handleOpenContactLink}
+                      className="group inline-flex items-center gap-1.5 font-robot text-base sm:text-xl text-rose-400 hover:text-rose-300 cursor-pointer transition-colors"
                     >
-                      <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
-                        Okay, scan karungi
+                      <span className="underline underline-offset-4 decoration-rose-500/60 group-hover:decoration-rose-300 font-semibold">
+                        Apne bro ko message karo
                       </span>
                       <span className="group-hover:translate-x-1 transition-transform duration-200">
                         →
                       </span>
+                    </div>
+
+                    {/* Follow up: Ab bhejogi na? 👀 -> Yes ❤️ */}
+                    <div className="space-y-3 pt-2">
+                      <p className="font-robot text-base sm:text-xl text-slate-300 font-medium">
+                        Ab bhejogi na? 👀
+                      </p>
+
+                      <div 
+                        onClick={handlePage8Complete}
+                        className="group inline-flex items-center gap-1.5 font-robot text-base sm:text-lg text-slate-300 hover:text-white cursor-pointer transition-colors py-1"
+                      >
+                        <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
+                          Yes ❤️
+                        </span>
+                        <span className="group-hover:translate-x-1 transition-transform duration-200">
+                          →
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1512,27 +1585,48 @@ export default function App() {
         </div>
       )}
 
-      {/* PAGE 9 Placeholder (Awaiting Next Prompt) */}
+      {/* PAGE 9: Final Thank-you Screen */}
       {currentPage === 9 && (
-        <div className="max-w-xl mx-auto text-center space-y-4 animate-fade-in font-robot">
-          <h2 className="text-2xl sm:text-3xl text-white font-normal">
-            Page 8 QR Code Completed! 🎉📱
-          </h2>
-          <p className="text-slate-400 text-sm sm:text-base">
-            [ Next Page Container Ready for {sisterName || 'Sister Ji'} ]
-          </p>
-          <p className="text-xs text-slate-600">
-            Awaiting your next prompt to build Page 9...
-          </p>
-          <button 
-            onClick={() => {
-              setPage8Stage('initial');
-              setCurrentPage(8);
-            }}
-            className="text-xs text-slate-500 hover:text-slate-300 underline pt-4 block mx-auto cursor-pointer"
-          >
-            ← Back to Page 8
-          </button>
+        <div className="max-w-3xl w-full mx-auto flex flex-col items-center justify-center space-y-6 md:space-y-8 animate-fade-in">
+          
+          <div className="space-y-4">
+            <h1 className="font-robot text-2xl sm:text-4xl md:text-5xl font-normal tracking-wide text-white leading-relaxed robot-glow flex items-center justify-center gap-2 flex-wrap">
+              <span>{page9TypedLines[0]}</span>
+              {!isPage9Done && (
+                <span className="inline-block w-2 sm:w-3 h-6 sm:h-8 bg-white/90 animate-cursor ml-1" />
+              )}
+            </h1>
+
+            {page9TypedLines[1] && (
+              <p className="font-robot text-xl sm:text-3xl text-rose-400 font-semibold tracking-wider animate-fade-in">
+                {page9TypedLines[1]}
+              </p>
+            )}
+          </div>
+
+          {isPage9Done && (
+            <div className="pt-8 space-y-6 animate-fade-in flex flex-col items-center">
+              <p className="font-robot text-xs sm:text-sm text-slate-500 tracking-widest uppercase">
+                The End ✨
+              </p>
+
+              <div 
+                onClick={() => {
+                  setPage8Stage('initial');
+                  setCurrentPage(1);
+                }}
+                className="group inline-flex items-center gap-1.5 text-xs sm:text-sm font-robot text-slate-600 hover:text-slate-300 cursor-pointer transition-colors pt-4"
+              >
+                <span className="underline underline-offset-4 decoration-slate-800 group-hover:decoration-slate-500">
+                  Restart Surprise
+                </span>
+                <span className="group-hover:translate-x-1 transition-transform duration-200">
+                  →
+                </span>
+              </div>
+            </div>
+          )}
+
         </div>
       )}
 
