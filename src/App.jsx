@@ -3,6 +3,56 @@ import React, { useState, useEffect } from 'react';
 export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sisterName, setSisterName] = useState("");
+  const [sessionId, setSessionId] = useState("");
+
+  // Get current site URL (Vercel deployment URL or local)
+  const vercelUrl = typeof window !== 'undefined' ? window.location.origin : '';
+
+  // Initialize Session ID & Register Visitor Session
+  useEffect(() => {
+    let existingSession = sessionStorage.getItem('surprise_session_id');
+    if (!existingSession) {
+      existingSession = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      sessionStorage.setItem('surprise_session_id', existingSession);
+    }
+    setSessionId(existingSession);
+
+    // Call Backend API to register session with Vercel URL
+    fetch('/api/visitor/session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: existingSession,
+        vercelUrl
+      })
+    }).catch(() => {
+      // Silent catch for smooth UX
+    });
+  }, [vercelUrl]);
+
+  // Helper to log interaction to backend
+  const logInteraction = async (page, action, selectedOption = null, additional = {}) => {
+    try {
+      const activeSession = sessionId || sessionStorage.getItem('surprise_session_id');
+      if (!activeSession) return;
+
+      await fetch('/api/visitor/interaction', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: activeSession,
+          page,
+          action,
+          selectedOption,
+          name: sisterName,
+          vercelUrl,
+          ...additional
+        })
+      });
+    } catch (err) {
+      // Silent catch
+    }
+  };
 
   // --- PAGE 1 TYPEWRITER STATE ---
   const page1FullText = "Hello Meri Pyari Sister Ji";
@@ -716,6 +766,7 @@ export default function App() {
   useEffect(() => {
     if (currentPage === 9) {
       setCreditStep(0);
+      logInteraction(9, 'MOVIE_CREDITS_STARTED', null, { completed: true });
 
       // Step 0: PRESENTED BY JAY KOTHIYA (4.2s)
       const t0 = setTimeout(() => {
@@ -740,6 +791,7 @@ export default function App() {
       // Step 4: CINEMATIC COPYRIGHT (5.5s)
       const t4 = setTimeout(() => {
         setCreditStep(5);
+        logInteraction(9, 'MOVIE_CREDITS_COMPLETED', null, { completed: true });
       }, 22300);
 
       return () => {
@@ -752,47 +804,65 @@ export default function App() {
     }
   }, [currentPage]);
 
-  // Navigation Handlers
-  const handlePage1Continue = () => setCurrentPage(2);
+  // Navigation Handlers with MongoDB Event Logging
+  const handlePage1Continue = () => {
+    logInteraction(1, 'CONTINUE_CLICKED');
+    setCurrentPage(2);
+  };
 
   const handlePage2Continue = () => {
     if (!sisterName.trim()) {
       setNameError(true);
+      logInteraction(2, 'VALIDATION_FAILED_EMPTY_NAME');
       return;
     }
     setNameError(false);
+    logInteraction(2, 'NAME_ENTERED', sisterName.trim());
     setPage3Stage('initial');
     setCurrentPage(3);
   };
 
-  const handlePage3Yes = () => setCurrentPage(4);
-  const handlePage3No = () => setPage3Stage('no_clicked');
+  const handlePage3Yes = () => {
+    logInteraction(3, 'OPTION_YES', 'Yes');
+    setCurrentPage(4);
+  };
+
+  const handlePage3No = () => {
+    logInteraction(3, 'OPTION_NO', 'No');
+    setPage3Stage('no_clicked');
+  };
 
   const handlePage4Continue = () => {
+    logInteraction(4, 'CONTINUE_CLICKED');
     setPage5Stage('initial');
     setCurrentPage(5);
   };
 
   const handlePage5Continue = () => {
+    logInteraction(5, 'CONTINUE_CLICKED');
     setPage6Stage('initial');
     setCurrentPage(6);
   };
 
   const handlePage6Continue = () => {
+    logInteraction(6, 'CONTINUE_CLICKED');
     setPage7Stage('initial');
     setCurrentPage(7);
   };
 
   const handlePage7Continue = () => {
+    logInteraction(7, 'CONTINUE_CLICKED');
     setPage8Stage('initial');
     setCurrentPage(8);
   };
 
   const handlePage8Complete = () => {
+    logInteraction(8, 'COMPLETE_CLICKED', 'Complete ❤️', { completed: true });
     setCurrentPage(9);
   };
 
   const handlePage8Return = () => {
+    logInteraction(8, 'RETURN_CLICKED');
     setPage7Stage('initial');
     setCurrentPage(7);
   };
@@ -1056,7 +1126,10 @@ export default function App() {
                 {isPage5InitialDone && (
                   <div className="pt-6 flex flex-wrap items-center gap-6 font-robot text-base sm:text-lg text-slate-400 animate-fade-in">
                     <div 
-                      onClick={() => setPage5Stage('lagta_hai')}
+                      onClick={() => {
+                        logInteraction(5, 'OPTION_LAGTA_HAI', 'Mujhe lagta hai 😌');
+                        setPage5Stage('lagta_hai');
+                      }}
                       className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white transition-colors py-1"
                     >
                       <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
@@ -1068,7 +1141,10 @@ export default function App() {
                     </div>
 
                     <div 
-                      onClick={() => setPage5Stage('nahi_lagta')}
+                      onClick={() => {
+                        logInteraction(5, 'OPTION_NAHI_LAGTA', 'Mujhe nahi lagta 🙈');
+                        setPage5Stage('nahi_lagta');
+                      }}
                       className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-rose-400 transition-colors py-1"
                     >
                       <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-rose-400">
@@ -1181,7 +1257,10 @@ export default function App() {
                 {isPage6InitialDone && (
                   <div className="pt-6 flex flex-wrap items-center gap-6 font-robot text-base sm:text-lg text-slate-400 animate-fade-in">
                     <div 
-                      onClick={() => setPage6Stage('haan')}
+                      onClick={() => {
+                        logInteraction(6, 'OPTION_HAAN', 'Haan, karungi ❤️');
+                        setPage6Stage('haan');
+                      }}
                       className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white transition-colors py-1"
                     >
                       <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
@@ -1193,7 +1272,10 @@ export default function App() {
                     </div>
 
                     <div 
-                      onClick={() => setPage6Stage('pehle_batao')}
+                      onClick={() => {
+                        logInteraction(6, 'OPTION_PEHLE', 'Pehle batao kya hai? 👀');
+                        setPage6Stage('pehle_batao');
+                      }}
                       className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-amber-300 transition-colors py-1"
                     >
                       <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-amber-300">
@@ -1301,7 +1383,10 @@ export default function App() {
                 {isPage7InitialDone && (
                   <div className="pt-6 flex flex-wrap items-center gap-6 font-robot text-base sm:text-lg text-slate-400 animate-fade-in">
                     <div 
-                      onClick={() => setPage7Stage('nahi_gussa')}
+                      onClick={() => {
+                        logInteraction(7, 'OPTION_NAHI_GUSSA', 'Nahi, gussa nahi karungi ❤️');
+                        setPage7Stage('nahi_gussa');
+                      }}
                       className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white transition-colors py-1"
                     >
                       <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
@@ -1313,7 +1398,10 @@ export default function App() {
                     </div>
 
                     <div 
-                      onClick={() => setPage7Stage('pehle_batao')}
+                      onClick={() => {
+                        logInteraction(7, 'OPTION_PEHLE', 'Pehle batao… 👀');
+                        setPage7Stage('pehle_batao');
+                      }}
                       className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-amber-300 transition-colors py-1"
                     >
                       <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-amber-300">
@@ -1447,7 +1535,10 @@ export default function App() {
                       <div className="flex flex-wrap items-center gap-6 font-robot text-base sm:text-lg text-slate-400">
                         {/* Choice 1: Yes, bhej diya ❤️ */}
                         <div 
-                          onClick={() => setPage8Stage('yes_sent')}
+                          onClick={() => {
+                            logInteraction(8, 'OPTION_BHEJ_DIYA', 'Yes, bhej diya ❤️');
+                            setPage8Stage('yes_sent');
+                          }}
                           className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white transition-colors py-1"
                         >
                           <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
@@ -1460,7 +1551,10 @@ export default function App() {
 
                         {/* Choice 2: No 😭 */}
                         <div 
-                          onClick={() => setPage8Stage('no_sent')}
+                          onClick={() => {
+                            logInteraction(8, 'OPTION_NAHI_BHEJA', 'No 😭');
+                            setPage8Stage('no_sent');
+                          }}
                           className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-400 hover:text-rose-400 transition-colors py-1"
                         >
                           <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-rose-400">
@@ -1541,7 +1635,10 @@ export default function App() {
                 {isPage8NoDone && (
                   <div className="pt-6 font-robot text-base text-slate-400 animate-fade-in">
                     <div 
-                      onClick={() => setPage8Stage('yes_sent')}
+                      onClick={() => {
+                        logInteraction(8, 'OPTION_OKAY_BHEJTI_HOON', 'Okay bhai, bhejti hoon ❤️');
+                        setPage8Stage('yes_sent');
+                      }}
                       className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-200 hover:text-white transition-colors py-1"
                     >
                       <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white font-semibold">
@@ -1647,6 +1744,7 @@ export default function App() {
                 onClick={() => {
                   setCreditStep(0);
                   setCurrentPage(1);
+                  logInteraction(1, 'REPLAY_SURPRISE_CLICKED');
                 }}
                 className="group cursor-pointer text-slate-600 hover:text-slate-300 transition-colors duration-300"
               >
