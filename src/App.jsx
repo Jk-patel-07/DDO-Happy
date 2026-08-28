@@ -14,13 +14,18 @@ export default function App() {
   const [page2TypedHeading, setPage2TypedHeading] = useState("");
   const [isPage2HeadingDone, setIsPage2HeadingDone] = useState(false);
 
+  // Page 2 Validation Warning State
+  const [nameError, setNameError] = useState(false);
+  const errorFullText = "⚠️ Pehle apna naam enter karo…";
+  const [typedErrorText, setTypedErrorText] = useState("");
+
   // PAGE 3 Typewriter State & Interaction Stages ('initial' | 'no_clicked')
   const [page3Stage, setPage3Stage] = useState('initial');
 
-  // Page 3 Initial Typing Lines
+  // Page 3 Initial Typing Lines (Dynamically addressing sisterName)
   const page3InitialLines = [
     "Ab ek baat bataye...",
-    "Aapka pyaar bhai aapke liye kuch laya hai ❤️",
+    `Aapka pyaar bhai ${sisterName ? sisterName : 'aapke'} liye kuch laya hai ❤️`,
     "Dekhna chahogi?"
   ];
   const [page3TypedLines, setPage3TypedLines] = useState(["", "", ""]);
@@ -29,7 +34,7 @@ export default function App() {
   // Page 3 Teasing "No" Response Lines
   const page3NoLines = [
     "Fir bhi dekhna padega 😌",
-    "Ye aapke bhai ka hukum hai... samjhi? 😏"
+    `Ye aapke bhai ka hukum hai, ${sisterName}... samjhi? 😏`
   ];
   const [page3TypedNoLines, setPage3TypedNoLines] = useState(["", ""]);
   const [isPage3NoDone, setIsPage3NoDone] = useState(false);
@@ -59,6 +64,8 @@ export default function App() {
       let index = 0;
       setPage2TypedHeading("");
       setIsPage2HeadingDone(false);
+      setNameError(false);
+      setTypedErrorText("");
       const timer = setInterval(() => {
         if (index < page2HeadingText.length) {
           setPage2TypedHeading(page2HeadingText.slice(0, index + 1));
@@ -71,6 +78,23 @@ export default function App() {
       return () => clearInterval(timer);
     }
   }, [currentPage]);
+
+  // --- PAGE 2 ERROR TYPEWRITER EFFECT ---
+  useEffect(() => {
+    if (nameError) {
+      let index = 0;
+      setTypedErrorText("");
+      const timer = setInterval(() => {
+        if (index < errorFullText.length) {
+          setTypedErrorText(errorFullText.slice(0, index + 1));
+          index++;
+        } else {
+          clearInterval(timer);
+        }
+      }, 45);
+      return () => clearInterval(timer);
+    }
+  }, [nameError]);
 
   // --- PAGE 3 INITIAL TYPEWRITER LOGIC ---
   useEffect(() => {
@@ -104,7 +128,7 @@ export default function App() {
 
       return () => clearInterval(timer);
     }
-  }, [currentPage, page3Stage]);
+  }, [currentPage, page3Stage, sisterName]);
 
   // --- PAGE 3 "NO CLICKED" TYPEWRITER LOGIC ---
   useEffect(() => {
@@ -138,23 +162,23 @@ export default function App() {
 
       return () => clearInterval(timer);
     }
-  }, [currentPage, page3Stage]);
+  }, [currentPage, page3Stage, sisterName]);
 
   // Navigation Handlers
   const handlePage1Continue = () => setCurrentPage(2);
   
   const handlePage2Continue = () => {
-    const nameToSave = sisterName.trim() || "Sister Ji";
-    setSisterName(nameToSave);
+    if (!sisterName.trim()) {
+      setNameError(true);
+      return;
+    }
+    setNameError(false);
     setPage3Stage('initial');
     setCurrentPage(3);
   };
 
   const handlePage3Yes = () => setCurrentPage(4);
-
-  const handlePage3No = () => {
-    setPage3Stage('no_clicked');
-  };
+  const handlePage3No = () => setPage3Stage('no_clicked');
 
   return (
     <main className="min-h-screen w-full bg-black text-slate-100 flex flex-col items-center justify-center text-center px-6 py-12 relative overflow-hidden select-none">
@@ -199,7 +223,7 @@ export default function App() {
         </div>
       )}
 
-      {/* PAGE 2: Name Introduction Page */}
+      {/* PAGE 2: Name Introduction Page with In-page Validation */}
       {currentPage === 2 && (
         <div className="max-w-2xl w-full mx-auto flex flex-col items-center justify-center space-y-6 md:space-y-8 animate-fade-in">
           
@@ -211,30 +235,47 @@ export default function App() {
           </h1>
 
           {isPage2HeadingDone && (
-            <div className="w-full flex flex-col items-center space-y-6 animate-fade-in">
+            <div className="w-full flex flex-col items-center space-y-5 animate-fade-in">
               
-              {/* Corrected: "hame" instead of "hume" */}
               <p className="font-robot text-sm sm:text-base md:text-lg text-slate-400 font-normal tracking-wide">
                 Aap hame apna naam batayengi?
               </p>
 
-              <div className="w-full max-w-xs sm:max-w-sm pt-2">
+              <div className="w-full max-w-xs sm:max-w-sm pt-1">
                 <input
                   type="text"
                   value={sisterName}
-                  onChange={(e) => setSisterName(e.target.value)}
+                  onChange={(e) => {
+                    setSisterName(e.target.value);
+                    if (nameError && e.target.value.trim()) {
+                      setNameError(false);
+                    }
+                  }}
                   placeholder="Type your name here…"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handlePage2Continue();
                   }}
-                  className="w-full bg-transparent border-b-2 border-slate-700 focus:border-white text-center font-robot text-base sm:text-xl text-white placeholder-slate-600 py-2.5 px-3 outline-none transition-colors duration-300"
+                  className={`w-full bg-transparent border-b-2 text-center font-robot text-base sm:text-xl text-white placeholder-slate-600 py-2.5 px-3 outline-none transition-colors duration-300 ${
+                    nameError ? 'border-rose-500' : 'border-slate-700 focus:border-white'
+                  }`}
                   autoFocus
                 />
               </div>
 
+              {/* In-page Robotic Validation Warning */}
+              {nameError && (
+                <div className="min-h-[24px]">
+                  <p className="font-robot text-xs sm:text-sm text-rose-400 font-normal tracking-wide animate-fade-in">
+                    {typedErrorText}
+                    <span className="inline-block w-1.5 h-4 bg-rose-400/90 animate-cursor ml-1 align-middle" />
+                  </p>
+                </div>
+              )}
+
+              {/* Plain Text-Only Continue Button */}
               <div 
                 onClick={handlePage2Continue}
-                className="group inline-flex items-center gap-1.5 text-sm sm:text-base font-robot text-slate-400 hover:text-white cursor-pointer transition-colors duration-200 pt-4"
+                className="group inline-flex items-center gap-1.5 text-sm sm:text-base font-robot text-slate-400 hover:text-white cursor-pointer transition-colors duration-200 pt-2"
               >
                 <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white transition-colors">
                   Continue
@@ -255,7 +296,6 @@ export default function App() {
         <div className="max-w-2xl w-full mx-auto flex flex-col items-center justify-center space-y-6 md:space-y-8 animate-fade-in">
           
           {page3Stage === 'initial' ? (
-            /* Stage 1: Initial Question */
             <div className="space-y-4">
               <div className="font-robot text-xl sm:text-3xl md:text-4xl font-normal tracking-wide text-white leading-relaxed robot-glow space-y-2">
                 <p>{page3TypedLines[0]}</p>
@@ -268,11 +308,8 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Options: "Yes →" and "No →" (Plain text links) */}
               {isPage3InitialDone && (
                 <div className="pt-6 flex items-center justify-center gap-8 font-robot text-base sm:text-xl text-slate-400 animate-fade-in">
-                  
-                  {/* Yes Option */}
                   <div 
                     onClick={handlePage3Yes}
                     className="group inline-flex items-center gap-1 cursor-pointer hover:text-white transition-colors py-1"
@@ -285,7 +322,6 @@ export default function App() {
                     </span>
                   </div>
 
-                  {/* No Option */}
                   <div 
                     onClick={handlePage3No}
                     className="group inline-flex items-center gap-1 cursor-pointer hover:text-rose-400 transition-colors py-1"
@@ -297,12 +333,10 @@ export default function App() {
                       →
                     </span>
                   </div>
-
                 </div>
               )}
             </div>
           ) : (
-            /* Stage 2: Playful Brother Hukum Tease when "No" was clicked */
             <div className="space-y-6">
               <div className="font-robot text-xl sm:text-3xl md:text-4xl font-normal tracking-wide text-white leading-relaxed robot-glow space-y-3">
                 <p>{page3TypedNoLines[0]}</p>
@@ -314,7 +348,6 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Single Option: "Ab Yes karo →" */}
               {isPage3NoDone && (
                 <div className="pt-6 font-robot text-base sm:text-xl text-slate-300 animate-fade-in flex justify-center">
                   <div 
