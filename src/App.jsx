@@ -4,12 +4,12 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sisterName, setSisterName] = useState("");
 
-  // PAGE 1 Typewriter State
+  // --- PAGE 1 TYPEWRITER STATE ---
   const page1FullText = "Hello Meri Pyari Sister Ji";
   const [page1TypedText, setPage1TypedText] = useState("");
   const [isPage1Done, setIsPage1Done] = useState(false);
 
-  // PAGE 2 Typewriter State
+  // --- PAGE 2 TYPEWRITER STATE ---
   const page2HeadingText = "Okay… now tell me your name 🤖";
   const [page2TypedHeading, setPage2TypedHeading] = useState("");
   const [isPage2HeadingDone, setIsPage2HeadingDone] = useState(false);
@@ -19,27 +19,35 @@ export default function App() {
   const errorFullText = "⚠️ Pehle apna naam enter karo…";
   const [typedErrorText, setTypedErrorText] = useState("");
 
-  // PAGE 3 Typewriter State & Interaction Stages ('initial' | 'no_clicked')
+  // --- PAGE 3 TYPEWRITER STATE ('initial' | 'no_clicked') ---
   const [page3Stage, setPage3Stage] = useState('initial');
 
-  // Page 3 Initial Typing Lines (Dynamically addressing sisterName)
+  // Page 3 Initial Typing Lines (Clean & natural Hinglish line)
   const page3InitialLines = [
     "Ab ek baat bataye...",
-    `Aapka pyaar bhai ${sisterName ? sisterName : 'aapke'} liye kuch laya hai ❤️`,
+    "Aapka pyara bhai aapke liye kuch laya hai ❤️",
     "Dekhna chahogi?"
   ];
   const [page3TypedLines, setPage3TypedLines] = useState(["", "", ""]);
   const [isPage3InitialDone, setIsPage3InitialDone] = useState(false);
 
-  // Page 3 Teasing "No" Response Lines
   const page3NoLines = [
     "Fir bhi dekhna padega 😌",
-    `Ye aapke bhai ka hukum hai, ${sisterName}... samjhi? 😏`
+    `Ye aapke bhai ka hukum hai, ${sisterName || 'Sister Ji'}... samjhi? 😏`
   ];
   const [page3TypedNoLines, setPage3TypedNoLines] = useState(["", ""]);
   const [isPage3NoDone, setIsPage3NoDone] = useState(false);
 
-  // --- PAGE 1 TYPEWRITER LOGIC ---
+  // --- PAGE 4 TYPEWRITER STATE ---
+  const page4Lines = [
+    `Hi, ${sisterName || 'Sister Ji'}!! 👋`,
+    "Waise aap bahut achi, pookie aur pyari ho…",
+    "Best Sister Ji ❤️"
+  ];
+  const [page4TypedLines, setPage4TypedLines] = useState(["", "", ""]);
+  const [isPage4Done, setIsPage4Done] = useState(false);
+
+  // --- PAGE 1 TYPEWRITER EFFECT ---
   useEffect(() => {
     if (currentPage === 1) {
       let index = 0;
@@ -58,7 +66,7 @@ export default function App() {
     }
   }, [currentPage]);
 
-  // --- PAGE 2 TYPEWRITER LOGIC ---
+  // --- PAGE 2 TYPEWRITER EFFECT ---
   useEffect(() => {
     if (currentPage === 2) {
       let index = 0;
@@ -96,7 +104,7 @@ export default function App() {
     }
   }, [nameError]);
 
-  // --- PAGE 3 INITIAL TYPEWRITER LOGIC ---
+  // --- PAGE 3 INITIAL TYPEWRITER EFFECT ---
   useEffect(() => {
     if (currentPage === 3 && page3Stage === 'initial') {
       setPage3TypedLines(["", "", ""]);
@@ -128,9 +136,9 @@ export default function App() {
 
       return () => clearInterval(timer);
     }
-  }, [currentPage, page3Stage, sisterName]);
+  }, [currentPage, page3Stage]);
 
-  // --- PAGE 3 "NO CLICKED" TYPEWRITER LOGIC ---
+  // --- PAGE 3 "NO CLICKED" TYPEWRITER EFFECT ---
   useEffect(() => {
     if (currentPage === 3 && page3Stage === 'no_clicked') {
       setPage3TypedNoLines(["", ""]);
@@ -164,9 +172,43 @@ export default function App() {
     }
   }, [currentPage, page3Stage, sisterName]);
 
+  // --- PAGE 4 CUTE MESSAGE TYPEWRITER EFFECT ---
+  useEffect(() => {
+    if (currentPage === 4) {
+      setPage4TypedLines(["", "", ""]);
+      setIsPage4Done(false);
+
+      let currentLineIdx = 0;
+      let charIdx = 0;
+
+      const timer = setInterval(() => {
+        if (currentLineIdx < page4Lines.length) {
+          const targetLine = page4Lines[currentLineIdx];
+          if (charIdx < targetLine.length) {
+            const nextChar = targetLine.slice(0, charIdx + 1);
+            setPage4TypedLines((prev) => {
+              const updated = [...prev];
+              updated[currentLineIdx] = nextChar;
+              return updated;
+            });
+            charIdx++;
+          } else {
+            currentLineIdx++;
+            charIdx = 0;
+          }
+        } else {
+          clearInterval(timer);
+          setIsPage4Done(true);
+        }
+      }, 55);
+
+      return () => clearInterval(timer);
+    }
+  }, [currentPage, sisterName]);
+
   // Navigation Handlers
   const handlePage1Continue = () => setCurrentPage(2);
-  
+
   const handlePage2Continue = () => {
     if (!sisterName.trim()) {
       setNameError(true);
@@ -223,7 +265,7 @@ export default function App() {
         </div>
       )}
 
-      {/* PAGE 2: Name Introduction Page with In-page Validation */}
+      {/* PAGE 2: Name Introduction Page with Validation */}
       {currentPage === 2 && (
         <div className="max-w-2xl w-full mx-auto flex flex-col items-center justify-center space-y-6 md:space-y-8 animate-fade-in">
           
@@ -262,7 +304,6 @@ export default function App() {
                 />
               </div>
 
-              {/* In-page Robotic Validation Warning */}
               {nameError && (
                 <div className="min-h-[24px]">
                   <p className="font-robot text-xs sm:text-sm text-rose-400 font-normal tracking-wide animate-fade-in">
@@ -272,7 +313,6 @@ export default function App() {
                 </div>
               )}
 
-              {/* Plain Text-Only Continue Button */}
               <div 
                 onClick={handlePage2Continue}
                 className="group inline-flex items-center gap-1.5 text-sm sm:text-base font-robot text-slate-400 hover:text-white cursor-pointer transition-colors duration-200 pt-2"
@@ -369,27 +409,58 @@ export default function App() {
         </div>
       )}
 
-      {/* PAGE 4 Placeholder (Awaiting Next Prompt) */}
+      {/* PAGE 4: Cute Character & Pooki Sister Message */}
       {currentPage === 4 && (
-        <div className="max-w-xl mx-auto text-center space-y-4 animate-fade-in font-robot">
-          <h2 className="text-2xl sm:text-3xl text-white font-normal">
-            Surprise Unlocked for <span className="text-rose-400">{sisterName}</span>! 🎉❤️
-          </h2>
-          <p className="text-slate-400 text-sm sm:text-base">
-            [ Page 3 Completed • Navigated to Page 4 ]
-          </p>
-          <p className="text-xs text-slate-600">
-            Awaiting your next prompt to build Page 4...
-          </p>
-          <button 
-            onClick={() => {
-              setPage3Stage('initial');
-              setCurrentPage(3);
-            }}
-            className="text-xs text-slate-500 hover:text-slate-300 underline pt-4 block mx-auto cursor-pointer"
-          >
-            ← Back to Page 3
-          </button>
+        <div className="max-w-5xl w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12 animate-fade-in">
+          
+          <div className="w-full md:w-[35%] flex justify-center items-center animate-slide-in-left">
+            <div className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 animate-character-float">
+              <img
+                src="/cute-character.png"
+                alt="Cute Sister Companion Character"
+                className="w-full h-full object-contain drop-shadow-[0_0_25px_rgba(244,63,94,0.3)]"
+              />
+              <div className="absolute inset-0 bg-pink-500/10 rounded-full blur-2xl pointer-events-none" />
+            </div>
+          </div>
+
+          <div className="w-full md:w-[65%] text-left space-y-4 md:space-y-6">
+            
+            <div className="font-robot text-xl sm:text-3xl md:text-4xl font-normal tracking-wide text-white leading-relaxed robot-glow space-y-3">
+              <p className="text-white font-semibold">
+                {page4TypedLines[0]}
+              </p>
+
+              <p className="text-slate-200 text-lg sm:text-2xl md:text-3xl">
+                {page4TypedLines[1]}
+              </p>
+
+              <p className="text-rose-400 text-lg sm:text-2xl md:text-3xl font-medium pt-1">
+                {page4TypedLines[2]}
+                {!isPage4Done && (
+                  <span className="inline-block w-2 sm:w-3 h-5 sm:h-7 bg-white/90 animate-cursor ml-1" />
+                )}
+              </p>
+            </div>
+
+            {isPage4Done && (
+              <div className="pt-6 font-robot text-sm sm:text-base text-slate-400 animate-fade-in flex items-center gap-6">
+                <div 
+                  onClick={() => {
+                    setPage3Stage('initial');
+                    setCurrentPage(3);
+                  }}
+                  className="group inline-flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors"
+                >
+                  <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
+                    ← Replay Tease
+                  </span>
+                </div>
+              </div>
+            )}
+
+          </div>
+
         </div>
       )}
 
