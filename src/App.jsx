@@ -4,10 +4,6 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sisterName, setSisterName] = useState("");
 
-  // Configurable Contact/Payment link for "Bhai ka number" and "Message your bro"
-  // (Note: Replace with actual phone number or WhatsApp/UPI URL if provided, e.g. "https://wa.me/91XXXXXXXXXX" or "tel:XXXXXXXXXX")
-  const BROTHER_CONTACT_LINK = "https://wa.me/?text=Bhai%20ko%20100%20rupees%20bhej%20diye!%20%E2%9D%A4%EF%B8%8F";
-
   // --- PAGE 1 TYPEWRITER STATE ---
   const page1FullText = "Hello Meri Pyari Sister Ji";
   const [page1TypedText, setPage1TypedText] = useState("");
@@ -148,11 +144,14 @@ export default function App() {
   const [page8TypedYes, setPage8TypedYes] = useState(["", "", ""]);
   const [isPage8YesDone, setIsPage8YesDone] = useState(false);
 
+  // Updated Funny Brother Message on "No 😭"
   const page8NoLines = [
-    "Kyun nahi bheja? 😭",
-    "Apne bhai ko ₹100 bhi nahi dogi? 😂"
+    "Apne bhai ke saath baat karo na… bhej na 😭😂",
+    "Bhejo fast fast fast! Chalo chalo! 👀",
+    "Itni tarif karne ka kya fayda…",
+    "agar aap nahi bhejogi toh! 😂❤️"
   ];
-  const [page8TypedNo, setPage8TypedNo] = useState(["", ""]);
+  const [page8TypedNo, setPage8TypedNo] = useState(["", "", "", ""]);
   const [isPage8NoDone, setIsPage8NoDone] = useState(false);
 
   // --- PAGE 9 (THANK YOU FINAL SCREEN) TYPEWRITER STATE ---
@@ -688,7 +687,7 @@ export default function App() {
   // --- PAGE 8 NO EFFECT ---
   useEffect(() => {
     if (currentPage === 8 && page8Stage === 'no_sent') {
-      setPage8TypedNo(["", ""]);
+      setPage8TypedNo(["", "", "", ""]);
       setIsPage8NoDone(false);
 
       let currentLineIdx = 0;
@@ -796,10 +795,6 @@ export default function App() {
   const handlePage8Return = () => {
     setPage7Stage('initial');
     setCurrentPage(7);
-  };
-
-  const handleOpenContactLink = () => {
-    window.open(BROTHER_CONTACT_LINK, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -1432,21 +1427,12 @@ export default function App() {
                 {isPage8InitialDone && (
                   <div className="space-y-6 animate-fade-in pt-2">
                     
-                    {/* Clickable text link: "Bhai ka number →" + Small Note */}
+                    {/* Plain Text: "Bhai ka number" + Subtitle note */}
                     <div className="space-y-1">
-                      <div 
-                        onClick={handleOpenContactLink}
-                        className="group inline-flex items-center gap-1.5 font-robot text-base sm:text-xl text-rose-400 hover:text-rose-300 cursor-pointer transition-colors"
-                      >
-                        <span className="underline underline-offset-4 decoration-rose-500/60 group-hover:decoration-rose-300 font-semibold">
-                          Bhai ka number
-                        </span>
-                        <span className="group-hover:translate-x-1 transition-transform duration-200">
-                          →
-                        </span>
-                      </div>
+                      <p className="font-robot text-base sm:text-xl text-rose-300 font-semibold">
+                        Bhai ka number
+                      </p>
                       
-                      {/* Subtitle note directly under link */}
                       <p className="font-robot text-xs sm:text-sm text-slate-400 font-normal italic">
                         “Jo aapke phone mein already save hai wahi 😌📱”
                       </p>
@@ -1542,8 +1528,10 @@ export default function App() {
               <div className="space-y-4">
                 <div className="font-robot text-lg sm:text-2xl md:text-3xl font-normal tracking-wide text-white leading-relaxed robot-glow space-y-2">
                   <p className="text-rose-400">{page8TypedNo[0]}</p>
-                  <p className="text-amber-300 font-medium">
-                    {page8TypedNo[1]}
+                  <p className="text-amber-300 font-medium">{page8TypedNo[1]}</p>
+                  <p>{page8TypedNo[2]}</p>
+                  <p className="text-rose-300 font-medium">
+                    {page8TypedNo[3]}
                     {!isPage8NoDone && (
                       <span className="inline-block w-2 sm:w-3 h-5 sm:h-7 bg-white/90 animate-cursor ml-1" />
                     )}
@@ -1551,37 +1539,17 @@ export default function App() {
                 </div>
 
                 {isPage8NoDone && (
-                  <div className="space-y-6 animate-fade-in pt-2">
-                    {/* Clickable text link: "Apne bro ko message karo →" */}
+                  <div className="pt-6 font-robot text-base text-slate-400 animate-fade-in">
                     <div 
-                      onClick={handleOpenContactLink}
-                      className="group inline-flex items-center gap-1.5 font-robot text-base sm:text-xl text-rose-400 hover:text-rose-300 cursor-pointer transition-colors"
+                      onClick={() => setPage8Stage('yes_sent')}
+                      className="group inline-flex items-center gap-1.5 cursor-pointer text-slate-200 hover:text-white transition-colors py-1"
                     >
-                      <span className="underline underline-offset-4 decoration-rose-500/60 group-hover:decoration-rose-300 font-semibold">
-                        Apne bro ko message karo
+                      <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white font-semibold">
+                        Okay bhai, bhejti hoon ❤️
                       </span>
                       <span className="group-hover:translate-x-1 transition-transform duration-200">
                         →
                       </span>
-                    </div>
-
-                    {/* Follow up: Ab bhejogi na? 👀 -> Yes ❤️ */}
-                    <div className="space-y-3 pt-2">
-                      <p className="font-robot text-base sm:text-xl text-slate-300 font-medium">
-                        Ab bhejogi na? 👀
-                      </p>
-
-                      <div 
-                        onClick={handlePage8Complete}
-                        className="group inline-flex items-center gap-1.5 font-robot text-base sm:text-lg text-slate-300 hover:text-white cursor-pointer transition-colors py-1"
-                      >
-                        <span className="underline underline-offset-4 decoration-slate-600 group-hover:decoration-white">
-                          Yes ❤️
-                        </span>
-                        <span className="group-hover:translate-x-1 transition-transform duration-200">
-                          →
-                        </span>
-                      </div>
                     </div>
                   </div>
                 )}
