@@ -9,8 +9,9 @@ const interactionSchema = new mongoose.Schema({
 
 const visitorSchema = new mongoose.Schema({
   sessionId: { type: String, required: true, unique: true, index: true },
-  name: { type: String, default: "" },
+  name: { type: String, required: true },
   vercelUrl: { type: String, default: "" },
+  choices: [{ type: String }],
   interactions: [interactionSchema],
   completed: { type: Boolean, default: false }
 }, {
