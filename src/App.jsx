@@ -6,7 +6,9 @@ export default function App() {
   const [sessionId, setSessionId] = useState("");
 
   // Get current site URL (Vercel deployment URL or local)
-  const vercelUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const vercelUrl = typeof window !== 'undefined'
+    ? (window.location.origin.includes('localhost') ? 'https://ddo-happy.vercel.app' : window.location.origin)
+    : 'https://ddo-happy.vercel.app';
 
   // Initialize Session ID & Register Visitor Session
   useEffect(() => {

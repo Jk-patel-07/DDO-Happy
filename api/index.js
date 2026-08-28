@@ -38,8 +38,9 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Routes
+// Routes (supports both /api/visitor and serverless /visitor paths)
 app.use('/api/visitor', visitorRoutes);
+app.use('/visitor', visitorRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({
