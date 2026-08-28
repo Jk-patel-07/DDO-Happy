@@ -5,6 +5,7 @@ export default function App() {
   const [sisterName, setSisterName] = useState("");
 
   // Configurable Contact/Payment link for "Bhai ka number" and "Message your bro"
+  // (Note: Replace with actual phone number or WhatsApp/UPI URL if provided, e.g. "https://wa.me/91XXXXXXXXXX" or "tel:XXXXXXXXXX")
   const BROTHER_CONTACT_LINK = "https://wa.me/?text=Bhai%20ko%20100%20rupees%20bhej%20diye!%20%E2%9D%A4%EF%B8%8F";
 
   // --- PAGE 1 TYPEWRITER STATE ---
@@ -1431,17 +1432,24 @@ export default function App() {
                 {isPage8InitialDone && (
                   <div className="space-y-6 animate-fade-in pt-2">
                     
-                    {/* Clickable text link: "Bhai ka number →" */}
-                    <div 
-                      onClick={handleOpenContactLink}
-                      className="group inline-flex items-center gap-1.5 font-robot text-base sm:text-xl text-rose-400 hover:text-rose-300 cursor-pointer transition-colors"
-                    >
-                      <span className="underline underline-offset-4 decoration-rose-500/60 group-hover:decoration-rose-300 font-semibold">
-                        Bhai ka number
-                      </span>
-                      <span className="group-hover:translate-x-1 transition-transform duration-200">
-                        →
-                      </span>
+                    {/* Clickable text link: "Bhai ka number →" + Small Note */}
+                    <div className="space-y-1">
+                      <div 
+                        onClick={handleOpenContactLink}
+                        className="group inline-flex items-center gap-1.5 font-robot text-base sm:text-xl text-rose-400 hover:text-rose-300 cursor-pointer transition-colors"
+                      >
+                        <span className="underline underline-offset-4 decoration-rose-500/60 group-hover:decoration-rose-300 font-semibold">
+                          Bhai ka number
+                        </span>
+                        <span className="group-hover:translate-x-1 transition-transform duration-200">
+                          →
+                        </span>
+                      </div>
+                      
+                      {/* Subtitle note directly under link */}
+                      <p className="font-robot text-xs sm:text-sm text-slate-400 font-normal italic">
+                        “Jo aapke phone mein already save hai wahi 😌📱”
+                      </p>
                     </div>
 
                     {/* Question: ₹100 bhej diya? 👀 */}
