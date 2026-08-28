@@ -144,7 +144,6 @@ export default function App() {
   const [page8TypedYes, setPage8TypedYes] = useState(["", "", ""]);
   const [isPage8YesDone, setIsPage8YesDone] = useState(false);
 
-  // Updated Funny Brother Message on "No 😭"
   const page8NoLines = [
     "Apne bhai ke saath baat karo na… bhej na 😭😂",
     "Bhejo fast fast fast! Chalo chalo! 👀",
@@ -154,13 +153,8 @@ export default function App() {
   const [page8TypedNo, setPage8TypedNo] = useState(["", "", "", ""]);
   const [isPage8NoDone, setIsPage8NoDone] = useState(false);
 
-  // --- PAGE 9 (THANK YOU FINAL SCREEN) TYPEWRITER STATE ---
-  const page9Lines = [
-    `Thank you meri pyari sister ji ❤️`,
-    "— Your Bro, Jay 😎"
-  ];
-  const [page9TypedLines, setPage9TypedLines] = useState(["", ""]);
-  const [isPage9Done, setIsPage9Done] = useState(false);
+  // --- PAGE 9 (MOVIE END CREDITS) STATE (0, 1, 2, 3, 4, 5) ---
+  const [creditStep, setCreditStep] = useState(0);
 
   // --- PAGE 1 EFFECT ---
   useEffect(() => {
@@ -718,37 +712,43 @@ export default function App() {
     }
   }, [currentPage, page8Stage]);
 
-  // --- PAGE 9 (FINAL SCREEN) EFFECT ---
+  // --- PAGE 9 (CINEMATIC END CREDITS TIMELINE EFFECT) ---
   useEffect(() => {
     if (currentPage === 9) {
-      setPage9TypedLines(["", ""]);
-      setIsPage9Done(false);
+      setCreditStep(0);
 
-      let currentLineIdx = 0;
-      let charIdx = 0;
+      // Step 0: PRESENTED BY JAY KOTHIYA (4.2s)
+      const t0 = setTimeout(() => {
+        setCreditStep(1);
+      }, 4200);
 
-      const timer = setInterval(() => {
-        if (currentLineIdx < page9Lines.length) {
-          const targetLine = page9Lines[currentLineIdx];
-          if (charIdx < targetLine.length) {
-            const nextChar = targetLine.slice(0, charIdx + 1);
-            setPage9TypedLines((prev) => {
-              const updated = [...prev];
-              updated[currentLineIdx] = nextChar;
-              return updated;
-            });
-            charIdx++;
-          } else {
-            currentLineIdx++;
-            charIdx = 0;
-          }
-        } else {
-          clearInterval(timer);
-          setIsPage9Done(true);
-        }
-      }, 60);
+      // Step 1: POWERED BY DDO UNIVERSE (4.2s)
+      const t1 = setTimeout(() => {
+        setCreditStep(2);
+      }, 8400);
 
-      return () => clearInterval(timer);
+      // Step 2: DESIGNED BY DDO ONE (4.2s)
+      const t2 = setTimeout(() => {
+        setCreditStep(3);
+      }, 12600);
+
+      // Step 3: FOUNDER — JK (5.0s)
+      const t3 = setTimeout(() => {
+        setCreditStep(4);
+      }, 17600);
+
+      // Step 4: COPYRIGHT & LOGO ENDING (6.0s)
+      const t4 = setTimeout(() => {
+        setCreditStep(5);
+      }, 23600);
+
+      return () => {
+        clearTimeout(t0);
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+        clearTimeout(t4);
+      };
     }
   }, [currentPage]);
 
@@ -1561,43 +1561,79 @@ export default function App() {
         </div>
       )}
 
-      {/* PAGE 9: Final Thank-you Screen */}
+      {/* PAGE 9: CINEMATIC MOVIE STYLE END CREDITS 🎬 */}
       {currentPage === 9 && (
-        <div className="max-w-3xl w-full mx-auto flex flex-col items-center justify-center space-y-6 md:space-y-8 animate-fade-in">
+        <div className="fixed inset-0 w-full h-full bg-black flex flex-col items-center justify-center text-center px-4 z-50 overflow-hidden">
           
-          <div className="space-y-4">
-            <h1 className="font-robot text-2xl sm:text-4xl md:text-5xl font-normal tracking-wide text-white leading-relaxed robot-glow flex items-center justify-center gap-2 flex-wrap">
-              <span>{page9TypedLines[0]}</span>
-              {!isPage9Done && (
-                <span className="inline-block w-2 sm:w-3 h-6 sm:h-8 bg-white/90 animate-cursor ml-1" />
-              )}
-            </h1>
+          {/* CREDIT 1: PRESENTED BY JAY KOTHIYA */}
+          {creditStep === 0 && (
+            <div className="animate-cinematic-credit flex flex-col items-center justify-center space-y-3 font-robot">
+              <span className="text-xs sm:text-sm uppercase tracking-[0.35em] text-slate-400 font-medium">
+                PRESENTED BY
+              </span>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.25em] text-white font-bold credit-glow">
+                JAY KOTHIYA
+              </h2>
+            </div>
+          )}
 
-            {page9TypedLines[1] && (
-              <p className="font-robot text-xl sm:text-3xl text-rose-400 font-semibold tracking-wider animate-fade-in">
-                {page9TypedLines[1]}
+          {/* CREDIT 2: POWERED BY DDO UNIVERSE */}
+          {creditStep === 1 && (
+            <div className="animate-cinematic-credit flex flex-col items-center justify-center space-y-3 font-robot">
+              <span className="text-xs sm:text-sm uppercase tracking-[0.35em] text-slate-400 font-medium">
+                POWERED BY
+              </span>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.25em] text-white font-bold credit-glow">
+                DDO UNIVERSE
+              </h2>
+            </div>
+          )}
+
+          {/* CREDIT 3: DESIGNED BY DDO ONE */}
+          {creditStep === 2 && (
+            <div className="animate-cinematic-credit flex flex-col items-center justify-center space-y-3 font-robot">
+              <span className="text-xs sm:text-sm uppercase tracking-[0.35em] text-slate-400 font-medium">
+                DESIGNED BY
+              </span>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.25em] text-white font-bold credit-glow">
+                DDO ONE
+              </h2>
+            </div>
+          )}
+
+          {/* CREDIT 4: FOUNDER — JK */}
+          {creditStep === 3 && (
+            <div className="animate-cinematic-credit flex flex-col items-center justify-center space-y-3 font-robot">
+              <h2 className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.25em] text-rose-400 font-bold credit-glow">
+                FOUNDER — JK
+              </h2>
+            </div>
+          )}
+
+          {/* CREDIT 5: COPYRIGHT & PRODUCTION LOGO ENDING */}
+          {creditStep === 4 && (
+            <div className="animate-copyright-fade flex flex-col items-center justify-center space-y-6 font-robot">
+              <div className="w-12 h-12 rounded-full border border-rose-500/40 flex items-center justify-center text-rose-400 text-sm font-bold tracking-widest shadow-[0_0_20px_rgba(244,63,94,0.3)]">
+                JK
+              </div>
+              <p className="text-xs sm:text-sm tracking-[0.2em] text-slate-400 font-normal">
+                © 2026 DDO Universe. All rights reserved.
               </p>
-            )}
-          </div>
+            </div>
+          )}
 
-          {isPage9Done && (
-            <div className="pt-8 space-y-6 animate-fade-in flex flex-col items-center">
-              <p className="font-robot text-xs sm:text-sm text-slate-500 tracking-widest uppercase">
-                The End ✨
-              </p>
-
+          {/* CREDIT 6: FADE TO PURE BLACK WITH OPTIONAL TAP RESTART */}
+          {creditStep === 5 && (
+            <div className="animate-fade-in flex flex-col items-center justify-center space-y-4 font-robot">
               <div 
                 onClick={() => {
-                  setPage8Stage('initial');
+                  setCreditStep(0);
                   setCurrentPage(1);
                 }}
-                className="group inline-flex items-center gap-1.5 text-xs sm:text-sm font-robot text-slate-600 hover:text-slate-300 cursor-pointer transition-colors pt-4"
+                className="group cursor-pointer text-slate-600 hover:text-slate-300 transition-colors duration-300"
               >
-                <span className="underline underline-offset-4 decoration-slate-800 group-hover:decoration-slate-500">
-                  Restart Surprise
-                </span>
-                <span className="group-hover:translate-x-1 transition-transform duration-200">
-                  →
+                <span className="text-xs uppercase tracking-[0.3em] underline underline-offset-4 decoration-slate-800 group-hover:decoration-slate-500">
+                  Replay Surprise Movie 🎬
                 </span>
               </div>
             </div>
@@ -1606,12 +1642,14 @@ export default function App() {
         </div>
       )}
 
-      {/* DDO COMPANY Small Bottom-Right Branding */}
-      <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-10">
-        <span className="text-[10px] sm:text-[11px] font-robot tracking-widest text-slate-600 uppercase opacity-70">
-          DDO COMPANY
-        </span>
-      </div>
+      {/* DDO COMPANY Small Bottom-Right Branding (Hidden during Page 9 End Credits) */}
+      {currentPage !== 9 && (
+        <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-10">
+          <span className="text-[10px] sm:text-[11px] font-robot tracking-widest text-slate-600 uppercase opacity-70">
+            DDO COMPANY
+          </span>
+        </div>
+      )}
 
     </main>
   );
