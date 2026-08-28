@@ -722,25 +722,25 @@ export default function App() {
         setCreditStep(1);
       }, 4200);
 
-      // Step 1: POWERED BY DDO UNIVERSE (4.2s)
+      // Step 1: POWERED BY DDO UNIVERSE + HORSE EMBLEM PHOTO (4.2s)
       const t1 = setTimeout(() => {
         setCreditStep(2);
       }, 8400);
 
-      // Step 2: DESIGNED BY DDO ONE (4.2s)
+      // Step 2: DESIGNED BY DDO ONE + HORSE EMBLEM PHOTO (4.2s)
       const t2 = setTimeout(() => {
         setCreditStep(3);
       }, 12600);
 
-      // Step 3: FOUNDER — JK (5.0s)
+      // Step 3: FOUNDER — JK (4.2s)
       const t3 = setTimeout(() => {
         setCreditStep(4);
-      }, 17600);
+      }, 16800);
 
-      // Step 4: COPYRIGHT & LOGO ENDING (6.0s)
+      // Step 4: CINEMATIC COPYRIGHT (5.5s)
       const t4 = setTimeout(() => {
         setCreditStep(5);
-      }, 23600);
+      }, 22300);
 
       return () => {
         clearTimeout(t0);
@@ -1577,27 +1577,45 @@ export default function App() {
             </div>
           )}
 
-          {/* CREDIT 2: POWERED BY DDO UNIVERSE */}
+          {/* CREDIT 2: POWERED BY DDO UNIVERSE + UPLOADED HORSE EMBLEM */}
           {creditStep === 1 && (
-            <div className="animate-cinematic-credit flex flex-col items-center justify-center space-y-3 font-robot">
-              <span className="text-xs sm:text-sm uppercase tracking-[0.35em] text-slate-400 font-medium">
-                POWERED BY
-              </span>
-              <h2 className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.25em] text-white font-bold credit-glow">
-                DDO UNIVERSE
-              </h2>
+            <div className="animate-cinematic-credit flex flex-col items-center justify-center space-y-4 font-robot">
+              <div className="w-28 h-28 sm:w-36 sm:h-36 relative flex items-center justify-center">
+                <img
+                  src="/horse-emblem.png"
+                  alt="DDO Universe Horse Emblem Logo"
+                  className="w-full h-full object-contain filter invert drop-shadow-[0_0_20px_rgba(76,224,165,0.4)]"
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-xs sm:text-sm uppercase tracking-[0.35em] text-slate-400 font-medium">
+                  POWERED BY
+                </span>
+                <h2 className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.25em] text-white font-bold credit-glow">
+                  DDO UNIVERSE
+                </h2>
+              </div>
             </div>
           )}
 
-          {/* CREDIT 3: DESIGNED BY DDO ONE */}
+          {/* CREDIT 3: DESIGNED BY DDO ONE + UPLOADED HORSE EMBLEM */}
           {creditStep === 2 && (
-            <div className="animate-cinematic-credit flex flex-col items-center justify-center space-y-3 font-robot">
-              <span className="text-xs sm:text-sm uppercase tracking-[0.35em] text-slate-400 font-medium">
-                DESIGNED BY
-              </span>
-              <h2 className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.25em] text-white font-bold credit-glow">
-                DDO ONE
-              </h2>
+            <div className="animate-cinematic-credit flex flex-col items-center justify-center space-y-4 font-robot">
+              <div className="w-28 h-28 sm:w-36 sm:h-36 relative flex items-center justify-center">
+                <img
+                  src="/horse-emblem.png"
+                  alt="DDO One Horse Emblem Logo"
+                  className="w-full h-full object-contain filter invert drop-shadow-[0_0_20px_rgba(76,224,165,0.4)]"
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-xs sm:text-sm uppercase tracking-[0.35em] text-slate-400 font-medium">
+                  DESIGNED BY
+                </span>
+                <h2 className="text-2xl sm:text-4xl md:text-5xl uppercase tracking-[0.25em] text-white font-bold credit-glow">
+                  DDO ONE
+                </h2>
+              </div>
             </div>
           )}
 
@@ -1610,19 +1628,19 @@ export default function App() {
             </div>
           )}
 
-          {/* CREDIT 5: COPYRIGHT & PRODUCTION LOGO ENDING */}
+          {/* CREDIT 5: CINEMATIC COPYRIGHT PRODUCTION LOGO */}
           {creditStep === 4 && (
-            <div className="animate-copyright-fade flex flex-col items-center justify-center space-y-6 font-robot">
-              <div className="w-12 h-12 rounded-full border border-rose-500/40 flex items-center justify-center text-rose-400 text-sm font-bold tracking-widest shadow-[0_0_20px_rgba(244,63,94,0.3)]">
-                JK
-              </div>
-              <p className="text-xs sm:text-sm tracking-[0.2em] text-slate-400 font-normal">
-                © 2026 DDO Universe. All rights reserved.
+            <div className="animate-cinematic-copyright flex flex-col items-center justify-center space-y-2 font-robot px-4 max-w-lg mx-auto">
+              <h3 className="text-xl sm:text-3xl md:text-4xl uppercase tracking-[0.25em] text-white font-bold credit-glow leading-snug">
+                © 2026 DDO Universe
+              </h3>
+              <p className="text-xs sm:text-sm uppercase tracking-[0.35em] text-slate-400 font-medium pt-1">
+                All Rights Reserved
               </p>
             </div>
           )}
 
-          {/* CREDIT 6: FADE TO PURE BLACK WITH OPTIONAL TAP RESTART */}
+          {/* CREDIT 6: FADE TO PURE BLACK WITH REPLAY MOVIE LINK */}
           {creditStep === 5 && (
             <div className="animate-fade-in flex flex-col items-center justify-center space-y-4 font-robot">
               <div 
